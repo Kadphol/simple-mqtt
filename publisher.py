@@ -14,7 +14,6 @@ while True:
             address = (publish[1], SERV_PORT)
             try:
                 s = socket(AF_INET, SOCK_STREAM)
-                s.settimeout(5)
                 s.connect(address)
                 s.send(textout.encode('utf-8'))
             except:

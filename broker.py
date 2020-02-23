@@ -1,36 +1,60 @@
 from socket import * 
 from threading import Thread
+import traceback
 import os,sys
 
 SERV_PORT = 50000
 
-def handle_client(s):
-    while True:
-        txtin = s.recv(1024)
-        print ('Client> %s' %(txtin).decode('utf-8')) 
-        if txtin == b'quit':
-            print('Client disconnected ...')
-            break
-        else:
-            txtout = txtin.upper()    
-            s.send(txtout)
+topics = {}
+
+def handle_client(s,addr):
+    try:
+        while True:
+            txtin = s.recv(1024)
+            value = txtin.decode('utf-8').split()
+
+            if(value[0] == 'publish'):
+                print('Publish> %s %s from %s:%s' %(value[2],value[3],str(addr[0]),str(addr[1])))
+                for topic in topics:
+                    if(topic == value[2]):
+                        for subscriber in topics[value[2]]:
+                            subscriber.send(txt[3].encode('utf-8'))
+                s.close()
+                break
+            elif(value[0] == 'subscribe'):
+                if(value[2] not in topics):
+                    subscriber = []
+                    subscriber.append(s)
+                    topics[value[2]] = subscriber
+                else:
+                    topics[value[2]].append(s)
+    except:
+        for topic in topics:
+            for subscriber in topics[topic]:
+                if(subscriber == s):
+                    topics[topic].remove(s)
+        print('%s:%s disconnected' %(str(addr[0]),str(addr[1])))
+    
     s.close()
     return
 
-def main():
-    addr = ('127.0.0.1', SERV_PORT)
+def main(argv):
+    address = '127.0.0.1'
+    if(len(sys.argv) == 2):
+        address = str(sys.argv[1])
+    addr = (address, SERV_PORT)
     s = socket(AF_INET, SOCK_STREAM)
     s.bind(addr)
     s.listen(5)
-    print ('TCP threaded server started ...')
+    print ('Broker started at ' + address)
 
     while True:
         sckt, addr = s.accept()
         ip, port = str(addr[0]), str(addr[1]) 
-        print ('New client connected from ..' + ip + ':' + port)
+        print ('New client connected from ' + ip + ':' + port)
     
         try:
-            Thread(target=handle_client, args=(sckt,)).start()
+            Thread(target=handle_client, args=(sckt,addr)).start()
         except:
             print("Cannot start thread..")  
             trackback.print_exc()
@@ -38,7 +62,7 @@ def main():
 
 if __name__ == '__main__':
     try:
-        main()
+        main(sys.argv)
     except KeyboardInterrupt:
         print ('Interrupted ..')
         try:
