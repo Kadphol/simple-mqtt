@@ -1,7 +1,6 @@
 from socket import * 
 from threading import Thread
 import os,sys
-import traceback
 
 SERV_PORT = 50000
 
