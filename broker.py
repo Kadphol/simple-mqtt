@@ -21,7 +21,7 @@ def delete_socket(conn_sock): #remove socket in topics
     for sockets in topics.values():
         for s in sockets:
             if(s == conn_sock):
-                sockets.remove(conn_sock)
+                del s
 
 def add_socket(conn_sock, topic): #add socket to topics
     if(topic in topics):
@@ -31,12 +31,10 @@ def add_socket(conn_sock, topic): #add socket to topics
 
 
 def handle_client(conn_sock, cli_sock_addr): #handle client socket
-  while True:
-    try:
+    while True:
         txtin = conn_sock.recv(2048).decode('utf-8') #receive text for client and decode
         message = shlex.split(txtin) #split text with shell lexical split
 
-        print(message)
         if(message[0] == 'subscribe'): #if this socket is subscribe
             if(message[1] == 'quit'): #if subscribe is quit
                 print('%s:%s disconneted' %(cli_sock_addr[0],cli_sock_addr[1]))
@@ -52,9 +50,8 @@ def handle_client(conn_sock, cli_sock_addr): #handle client socket
                     s.send(message[3].encode('utf-8')) #publish value to subscriber in that topic
             print('%s:%s disconnected' %(cli_sock_addr[0],cli_sock_addr[1]))
             conn_sock.close() #close socket
-        break
-    except BlockingIOError:
-        pass
+            break
+
 
 
 def main():
