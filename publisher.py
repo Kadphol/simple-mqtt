@@ -34,7 +34,7 @@ def main():
 
 if __name__ == '__main__':
     try:
-        s = socket(AF_INET, SOCK_STREAM)
+        s = socket(AF_INET, SOCK_STREAM) #create socket
         main()
     except KeyboardInterrupt:
         try:
