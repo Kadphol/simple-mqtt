@@ -32,25 +32,28 @@ def add_socket(conn_sock, topic): #add socket to topics
 
 def handle_client(conn_sock, cli_sock_addr): #handle client socket
     while True:
-        txtin = conn_sock.recv(2048).decode('utf-8') #receive text for client and decode
-        message = shlex.split(txtin) #split text with shell lexical split
+        try:
+            txtin = conn_sock.recv(2048).decode('utf-8') #receive text for client and decode
+            message = shlex.split(txtin) #split text with shell lexical split
 
-        if(message[0] == 'subscribe'): #if this socket is subscribe
-            if(message[1] == 'quit'): #if subscribe is quit
-                print('%s:%s disconneted' %(cli_sock_addr[0],cli_sock_addr[1]))
-                delete_socket(conn_sock) #delete socket in topics
+            if(message[0] == 'subscribe'): #if this socket is subscribe
+                if(message[1] == 'quit'): #if subscribe is quit
+                    print('%s:%s disconneted' %(cli_sock_addr[0],cli_sock_addr[1]))
+                    delete_socket(conn_sock) #delete socket in topics
+                    break
+                else:
+                    print('%s:%s subscribe for topic %s' %(cli_sock_addr[0],cli_sock_addr[1],message[2]))
+                    add_socket(conn_sock,message[2]) #add socket to topic
+
+            elif(message[0] == 'publish'):
+                if(message[2] in topics.keys()):
+                    for s in topics[message[2]]:
+                        s.send(message[3].encode('utf-8')) #publish value to subscriber in that topic
+                print('%s:%s disconnected' %(cli_sock_addr[0],cli_sock_addr[1]))
+                conn_sock.close() #close socket
                 break
-            else:
-                print('%s:%s subscribe for topic %s' %(cli_sock_addr[0],cli_sock_addr[1],message[2]))
-                add_socket(conn_sock,message[2]) #add socket to topic
-
-        elif(message[0] == 'publish'):
-            if(message[2] in topics.keys()):
-                for s in topics[message[2]]:
-                    s.send(message[3].encode('utf-8')) #publish value to subscriber in that topic
-            print('%s:%s disconnected' %(cli_sock_addr[0],cli_sock_addr[1]))
-            conn_sock.close() #close socket
-            break
+        except BlockingIOError:
+            pass
 
 
 
