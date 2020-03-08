@@ -22,16 +22,15 @@ def delete_socket(conn_sock):
 
 def add_socket(conn_sock, topic):
     if(topic in topics):
-        topics[topic].append(conn_sock)
+        topics[topic].append({conn_sock})
     else:
-        topics[topic] = conn_sock
+        topics[topic] = {conn_sock}
 
 
 def handle_client(conn_sock, cli_sock_addr):
   while True:
     try:
-        txtin = conn_sock.recv(2048)
-        txtin.decode('utf-8')
+        txtin = conn_sock.recv(2048).decode('utf-8')
         message = shlex.split(txtin)
 
         if(message[0] == 'subscribe'):
@@ -62,7 +61,7 @@ def main():
     while True:
         conn_sock, cli_sock_addr = welcome_sock.accept()
         ip, port = str(cli_sock_addr[0]), str(cli_sock_addr[1]) 
-        print ('New client connected from ..' + ip + ':' + port)
+        print ('New client connected from ' + ip + ':' + port)
     
         try:
             Thread(target=handle_client, args=(conn_sock, cli_sock_addr)).start()

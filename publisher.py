@@ -16,7 +16,6 @@ def main():
             if(publish[0] == 'publish'):
                 address = (publish[1], SERV_PORT)
                 try:
-                    s = socket(AF_INET, SOCK_STREAM)
                     s.connect(address)
                     s.send(textout.encode('utf-8'))
                 except:
@@ -30,6 +29,7 @@ def main():
 
 if __name__ == '__main__':
     try:
+        s = socket(AF_INET, SOCK_STREAM)
         main()
     except KeyboardInterrupt:
         print('')
