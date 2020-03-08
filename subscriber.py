@@ -47,7 +47,7 @@ def main():
                 print('\ndisconnected')
                 break
         else:
-            break
+            pass
     shutdown_socket(s) #shutdown socket
 
 if __name__ == '__main__':
