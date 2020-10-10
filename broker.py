@@ -25,9 +25,9 @@ def delete_socket(conn_sock): #remove socket in topics
 
 def add_socket(conn_sock, topic): #add socket to topics
     if(topic in topics):
-        topics[topic].append({conn_sock}) #append socket to existing topic
+        topics[topic].append(conn_sock) #append socket to existing topic
     else:
-        topics[topic] = {conn_sock} #add new topic 
+        topics[topic] = [conn_sock] #add new topic
 
 
 def handle_client(conn_sock, cli_sock_addr): #handle client socket
